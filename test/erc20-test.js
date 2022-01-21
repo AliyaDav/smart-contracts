@@ -49,7 +49,6 @@ describe("ERC20", function () {
 
         it('Owner should have total supply', async function () {
 
-            // const owner_balance = await erc20.balanceOf(owner);
             expect((await erc20.balanceOf(owner.address)).toString()).to.equal(BigNumber.from(`${TOTAL_SUPPLY}`));
         });
 
@@ -60,12 +59,12 @@ describe("ERC20", function () {
         it('Increase allowance of the addreess', async function () {
 
             const initial_allowance = await erc20.allowance(owner.address, addr1.address);
-            // console.log(initial_allowance);
 
-            await erc20.connect(owner).increaseAllowance(addr1.address, 100);
+            const tx = erc20.connect(owner).increaseAllowance(addr1.address, 100);
+            await expect(tx).to.emit(erc20, "Approval").withArgs(owner.address, addr1.address, initial_allowance.add(100));
 
             const new_allowance = await erc20.allowance(owner.address, addr1.address);
-            expect(new_allowance).to.equal(initial_allowance + 100);
+            expect(new_allowance).to.equal(initial_allowance.add(100));
         });
 
         it('Transfer to address', async function () {
@@ -88,12 +87,13 @@ describe("ERC20", function () {
             const initial_balance_sender = await erc20.balanceOf(owner.address);
             const initial_balance_receipient = await erc20.balanceOf(addr2.address);
             const amount = 50;
-
-            // check Events
-            await erc20.connect(owner).increaseAllowance(addr1.address, 100);
             const initial_allowance = await erc20.allowance(owner.address, addr1.address);
 
-            await erc20.connect(addr1).transferFrom(owner.address, addr2.address, amount);
+            let tx1 = await erc20.connect(owner).increaseAllowance(addr1.address, 100);
+            await expect(tx1).to.emit(erc20, "Approval").withArgs(owner.address, addr1.address, initial_allowance.add(100));
+
+            let tx2 = erc20.connect(addr1).transferFrom(owner.address, addr2.address, amount);
+            await expect(tx2).to.emit(erc20, "Transfer").withArgs(owner.address, addr2.address, amount);
 
             const new_balance_sender = await erc20.balanceOf(owner.address);
             const new_balance_receipient = await erc20.balanceOf(addr2.address);
@@ -101,7 +101,7 @@ describe("ERC20", function () {
 
             expect(new_balance_sender).to.equal(initial_balance_sender.sub(amount));
             expect(new_balance_receipient).to.equal(initial_balance_receipient.add(amount));
-            expect(new_allowance).to.equal(initial_allowance.sub(amount));
+            expect(new_allowance).to.equal(initial_allowance.add(100).sub(amount));
         });
 
         it('Decrease allowance of the address', async function () {
@@ -138,7 +138,8 @@ describe("ERC20", function () {
             const initial_balance = await erc20.balanceOf(owner.address);
             const intial_total_supply = await erc20.totalSupply();
 
-            await erc20.connect(owner)._burn(20);
+            const tx = erc20.connect(owner)._burn(20);
+            await expect(tx).to.emit(erc20, "Burned").withArgs(owner.address, 20);
 
             const new_balance = await erc20.balanceOf(owner.address);
             const new_total_supply = await erc20.totalSupply();

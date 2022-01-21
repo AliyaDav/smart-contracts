@@ -19,3 +19,5 @@ main()
     console.error(error);
     process.exit(1);
   });
+
+  // deployed to: 0x222e82Ef3B2Cfc5aE9083Ee90012b40d13fA7CC4
