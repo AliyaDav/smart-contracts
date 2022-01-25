@@ -4,7 +4,7 @@
 
 The contract is an implementation of ERC20 token. 
 
-Deployed to [Ropsten](https://ropsten.etherscan.io/tx/0xbdde718c1f03ec9a2bd6460af607b9f1e15433ff8e1bb8de94fa7e80fdcc89f7)
+Deployed to [Ropsten](https://ropsten.etherscan.io/tx/0x545b77e941bec4cbe3cbb7a40dc66c578e214d6c1ab244d6b64f437d243f455a)
 
 Available tasks:
 

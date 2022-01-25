@@ -36,7 +36,7 @@ contract ERC20 {
     }
 
     modifier onlyOwner() {
-        require(msg.sender == _minter, "Only contract owner can mint tokens");
+        require(msg.sender == _minter, "Access resticted to only owner");
         _;
     }
 
@@ -164,7 +164,7 @@ contract ERC20 {
         return true;
     }
 
-    function _burn(uint256 amount) public returns (bool) {
+    function _burn(uint256 amount) public onlyOwner returns (bool) {
         require(
             _balances[msg.sender] >= amount,
             "The balance is less than burning amount"

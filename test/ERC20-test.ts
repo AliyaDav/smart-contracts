@@ -185,8 +185,8 @@ describe("ERC20", function () {
             const tx1 = erc20.connect(owner)._burn(20000);
             await expect(tx1).to.be.revertedWith("The balance is less than burning amount");
 
-            // const tx2 = erc20.connect(addr2)._burn(20);
-            // await expect(tx2).to.be.revertedWith("Does not have a burner role");
+            const tx2 = erc20.connect(addr2)._burn(20);
+            await expect(tx2).to.be.revertedWith("Access resticted to only owner");
 
         });
 
