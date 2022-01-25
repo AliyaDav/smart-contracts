@@ -6,7 +6,7 @@ import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
-import "./tasks/ERC20-Tasks";
+import "./tasks/ERC20-tasks";
 
 dotenv.config();
 

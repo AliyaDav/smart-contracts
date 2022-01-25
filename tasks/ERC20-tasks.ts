@@ -1,6 +1,9 @@
-import "@nomiclabs/hardhat-web3";
+import { task } from "hardhat/config";
+import "@nomiclabs/hardhat-etherscan";
+import "@nomiclabs/hardhat-ethers";
+import "@nomiclabs/hardhat-waffle";
 import { ethers } from "hardhat";
-// import { task } from "hardhat/config";
+import "hardhat-typechain";
 
 task("accounts", "Prints the list of accounts").setAction(async () => {
 
@@ -17,21 +20,20 @@ task("balance", "Prints an account's balance")
     .setAction(async (taskArgs: { account: any; }) => {
 
         const account = taskArgs.account;
-        const contract = await ethers.getContractAt("ERC20", '0x222e82Ef3B2Cfc5aE9083Ee90012b40d13fA7CC4');
+        const contract = await ethers.getContractAt("ERC20", '0xBE56c7cc235E25C9873e55Df8fc1A2434d74ef2B');
         const balance = await contract.balanceOf(account);
 
         console.log(balance);
     });
 
 task("transfer", "Transfers tokens to a given account")
-    // .addParam("account", "The recipient's address")
-    // .addParam("amount", "The amount to trasfer")
+    .addParam("account", "The recipient's address")
+    .addParam("amount", "The amount to trasfer")
     .setAction(async (taskArgs: { account: any; amount: any; }) => {
 
         const account = taskArgs.account;
-        const contract = await ethers.getContractAt("ERC20", '0x222e82Ef3B2Cfc5aE9083Ee90012b40d13fA7CC4');
-        const amount = ethers.utils.parseUnits(taskArgs.amount, await contract.decimals());
-        const signer = ethers.getSigners()
+        const contract = await ethers.getContractAt("ERC20", '0xBE56c7cc235E25C9873e55Df8fc1A2434d74ef2B');
+        const amount = ethers.utils.parseUnits(taskArgs.amount, await contract._decimals());
 
         let result = await contract.transfer(account, amount);
         console.log(result);
@@ -43,8 +45,8 @@ task("mint", "Transfers tokens to a given account")
     .setAction(async (taskArgs: { amount: any; value: any; }) => {
 
         const account = taskArgs.amount;
-        const contract = await ethers.getContractAt("ERC20", '0x222e82Ef3B2Cfc5aE9083Ee90012b40d13fA7CC4');
-        const amount = ethers.utils.parseUnits(taskArgs.value, await contract.decimals());
+        const contract = await ethers.getContractAt("ERC20", '0xBE56c7cc235E25C9873e55Df8fc1A2434d74ef2B');
+        const amount = ethers.utils.parseUnits(taskArgs.value, await contract._decimals());
 
         let result = contract._mint(account, amount);
         console.log(result);
@@ -55,13 +57,14 @@ task("transferFrom", "Transfers tokens from a given address to another given acc
     .addParam("recipient", "The recipient's address")
     .addParam("sender", "The sender's address")
     .addParam("amount", "The amount to trasfer")
-    .setAction(async (taskArgs: { recipient: any; amount: any; }) => {
+    .setAction(async (taskArgs: { recipient: any; sender: any, amount: any; }) => {
 
-        const contract = await ethers.getContractAt("ERC20", '0x222e82Ef3B2Cfc5aE9083Ee90012b40d13fA7CC4');
-        const amount = ethers.utils.parseUnits(taskArgs.amount, await contract.decimals());
-        const signer = ethers.getSigners();
+        const contract = await ethers.getContractAt("ERC20", '0xBE56c7cc235E25C9873e55Df8fc1A2434d74ef2B');
+        const amount = ethers.utils.parseUnits(taskArgs.amount, await contract._decimals());
+        const recipient = taskArgs.recipient;
+        const sender = taskArgs.sender;
 
-        let result = await contract.transferFrom(signer[0], recipient, amount);
+        let result = await contract.connect(sender[0]).transferFrom(sender, recipient, amount);
         console.log(result);
 
     });
@@ -72,13 +75,13 @@ task("increaseAllowance", "Increase allowance for an address")
     .setAction(async (taskArgs: { account: any; amount: any; }) => {
 
         const account = taskArgs.account;
-        const contract = await ethers.getContractAt("ERC20", '0x222e82Ef3B2Cfc5aE9083Ee90012b40d13fA7CC4');
-        const amount = ethers.utils.parseUnits(taskArgs.amount, await contract.decimals());
+        const contract = await ethers.getContractAt("ERC20", '0xBE56c7cc235E25C9873e55Df8fc1A2434d74ef2B');
+        const amount = ethers.utils.parseUnits(taskArgs.amount, await contract._decimals());
         const signer = await ethers.getSigners();
-        const initial_allowance = await contract.allowance(signer[0].address, account);
 
-        let result = await contract.increaseAllowance(account, amount);
-        console.log(result);
+        await contract.increaseAllowance(account, amount);
+        const new_allowance = await contract.allowance(signer[0].address, account);
+        console.log("New allowance", new_allowance);
 
     });
 
@@ -87,7 +90,7 @@ task("allowance", "Show allowance of an address")
     .setAction(async (taskArgs: { account: any; }) => {
 
         const account = taskArgs.account;
-        const contract = await ethers.getContractAt("ERC20", '0x222e82Ef3B2Cfc5aE9083Ee90012b40d13fA7CC4');
+        const contract = await ethers.getContractAt("ERC20", '0xBE56c7cc235E25C9873e55Df8fc1A2434d74ef2B');
         const signer = await ethers.getSigners();
 
         let allowance = await contract.allowance(signer[0].address, account);
@@ -95,10 +98,6 @@ task("allowance", "Show allowance of an address")
 
     });
 
-
-function task(arg0: string, arg1: string) {
-    throw new Error("Function not implemented.");
-}
 // test accounts:
 // 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 // 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
