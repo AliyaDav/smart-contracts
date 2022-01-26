@@ -11,7 +11,6 @@ async function main() {
     await erc20.deployed();
 
     console.log("ERC20 deployed to:", erc20.address);
-    // console.log("")
 }
 
 main()
@@ -21,5 +20,4 @@ main()
         process.exit(1);
     });
 
-  // deployed to: 0x222e82Ef3B2Cfc5aE9083Ee90012b40d13fA7CC4
-//   version 2.0 deployed to: 0xBE56c7cc235E25C9873e55Df8fc1A2434d74ef2B
+  // deployed to: 0x123a4e70CD8e3c2C05BB4f75Bc6cBa530345A9DC
