@@ -187,7 +187,6 @@ describe("ERC20", function () {
 
             const tx2 = erc20.connect(addr2)._burn(20);
             await expect(tx2).to.be.revertedWith("Access resticted to only owner");
-
         });
 
     });

@@ -11,13 +11,13 @@ import "./tasks/ERC20-tasks";
 dotenv.config();
 
 const ROPSTEN_PRIVATE_KEY = process.env.ROPSTEN_PRIVATE_KEY;
-const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID;
+const ALCHEMY_PROJECT_ID = process.env.ALCHEMY_PROJECT_ID;
 
 const config: HardhatUserConfig = {
   solidity: "0.8.4",
   networks: {
     ropsten: {
-      url: `https://ropsten.infura.io/v3/${INFURA_PROJECT_ID}`,
+      url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_PROJECT_ID}`,
       accounts: [`${ROPSTEN_PRIVATE_KEY}`]
     },
   },
@@ -31,7 +31,6 @@ const config: HardhatUserConfig = {
 };
 
 export default config;
-
 
 //   paths: {
 //     tests: "./tests",

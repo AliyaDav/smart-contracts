@@ -28,7 +28,7 @@ contract ERC20 {
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
-        _totalSupply = 1000;
+        _totalSupply = 1000; // no initial mint needed
         _minter = msg.sender;
 
         _balances[_minter] = _totalSupply;
@@ -146,7 +146,7 @@ contract ERC20 {
         _allowances[owner][spender] = amount;
     }
 
-    function _mint(address account, uint256 amount)
+    function mint(address account, uint256 amount)
         public
         onlyOwner
         returns (bool)
@@ -164,17 +164,23 @@ contract ERC20 {
         return true;
     }
 
-    function _burn(uint256 amount) public onlyOwner returns (bool) {
+    function _burn(address account, uint256 amount)
+        public
+        onlyOwner
+        returns (bool)
+    {
         require(
-            _balances[msg.sender] >= amount,
+            _balances[account] >= amount,
             "The balance is less than burning amount"
         );
         // require(_burners.has(msg.sender), "Does not have a burner role");
 
-        _balances[msg.sender] -= amount;
+        _balances[account] -= amount;
         _totalSupply -= amount;
 
-        emit Burned(msg.sender, amount);
+        // emit Burned(msg.sender, amount);
+        emit Transfer(account, address(0), amount);
+
         return true;
     }
 }
