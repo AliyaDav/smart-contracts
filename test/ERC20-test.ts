@@ -37,24 +37,20 @@ describe("ERC20", function () {
     describe('Deployment', function () {
 
         it('Should return name', async function () {
-            expect((await erc20._name())).to.equal(`${NAME}`);
+            expect((await erc20.name())).to.equal(`${NAME}`);
         });
 
         it('Should return symbol', async function () {
-            expect((await erc20._symbol())).to.equal(`${SYMBOL}`);
+            expect((await erc20.symbol())).to.equal(`${SYMBOL}`);
         });
 
         it('Should return decimals', async function () {
-            expect((await erc20._decimals())).to.equal(`${DECIMALS}`);
-        });
-
-        it('Minter is the owner', async function () {
-            expect((await erc20._minter())).to.equal(owner.address);
+            expect((await erc20.decimals())).to.equal(`${DECIMALS}`);
         });
 
         it('Should return total supply', async function () {
 
-            const totalSupply = await erc20._totalSupply();
+            const totalSupply = await erc20.totalSupply();
             expect(totalSupply).to.equal(`${TOTAL_SUPPLY}`);
         })
 
@@ -79,9 +75,6 @@ describe("ERC20", function () {
 
             const tx2 = erc20.connect(owner).increaseAllowance(ZERO_ADDRESS, 100);
             await expect(tx2).to.be.revertedWith("ERC20: approve to the zero address");
-
-            // const tx3 = erc20.connect(ZERO_ADDRESS).increaseAllowance(owner.address, 100);
-            // await expect(tx3).to.be.revertedWith("ERC20: approve from the zero address");
 
         });
 
@@ -153,15 +146,16 @@ describe("ERC20", function () {
         it('Should mint a certain amount to the address', async function () {
 
             const initial_balance = await erc20.balanceOf(addr1.address);
-            const intial_total_supply = await erc20._totalSupply();
+            const intial_total_supply = await erc20.totalSupply();
 
-            let tx = erc20.connect(owner)._mint(ZERO_ADDRESS, 20);
+            let tx = erc20.connect(owner).mint(ZERO_ADDRESS, 20);
             await expect(tx).to.be.revertedWith("ERC20: mint to the zero address");
 
-            await erc20.connect(owner)._mint(addr1.address, 20);
+            let tx2 = await erc20.connect(owner).mint(addr1.address, 20);
+            await expect(tx2).to.emit(erc20, "Transfer").withArgs(ZERO_ADDRESS, addr1.address, 20);
 
             const new_balance = await erc20.balanceOf(addr1.address);
-            const new_total_supply = await erc20._totalSupply();
+            const new_total_supply = await erc20.totalSupply();
 
             expect(new_balance).to.equal(initial_balance.add(20));
             expect(new_total_supply).to.equal(intial_total_supply.add(20));
@@ -171,21 +165,21 @@ describe("ERC20", function () {
         it('Should burn a certain amount', async function () {
 
             const initial_balance = await erc20.balanceOf(owner.address);
-            const intial_total_supply = await erc20._totalSupply();
+            const intial_total_supply = await erc20.totalSupply();
 
-            const tx = erc20.connect(owner)._burn(20);
-            await expect(tx).to.emit(erc20, "Burned").withArgs(owner.address, 20);
+            const tx = erc20.connect(owner).burn(owner.address, 20);
+            await expect(tx).to.emit(erc20, "Transfer").withArgs(owner.address, ZERO_ADDRESS, 20);
 
             const new_balance = await erc20.balanceOf(owner.address);
-            const new_total_supply = await erc20._totalSupply();
+            const new_total_supply = await erc20.totalSupply();
 
             expect(new_balance).to.equal(initial_balance.sub(20));
             expect(new_total_supply).to.equal(intial_total_supply.sub(20));
 
-            const tx1 = erc20.connect(owner)._burn(20000);
+            const tx1 = erc20.connect(owner).burn(owner.address, 20000);
             await expect(tx1).to.be.revertedWith("The balance is less than burning amount");
 
-            const tx2 = erc20.connect(addr2)._burn(20);
+            const tx2 = erc20.connect(addr2).burn(addr2.address, 20);
             await expect(tx2).to.be.revertedWith("Access resticted to only owner");
         });
 

@@ -4,16 +4,14 @@ pragma solidity ^0.8.0;
 // import "@openzeppelin/contracts/access/Roles.sol";
 
 contract ERC20 {
-    string public _name;
-    string public _symbol;
-    uint256 public _totalSupply;
-    uint256 public _decimals = 18;
-    address public _minter;
+    string private _name;
+    string private _symbol;
+    uint256 private _totalSupply;
+    uint256 private _decimals = 18;
+    address private _minter;
 
     mapping(address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;
-
-    // Roles.Role private _burners;
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(
@@ -21,9 +19,6 @@ contract ERC20 {
         address indexed _spender,
         uint256 _value
     );
-    event Burned(address indexed _owner, uint256 amount);
-
-    // using Roles for Roles.Role;
 
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
@@ -40,19 +35,19 @@ contract ERC20 {
         _;
     }
 
-    function name() private view returns (string memory) {
+    function name() public view returns (string memory) {
         return _name;
     }
 
-    function symbol() private view returns (string memory) {
+    function symbol() public view returns (string memory) {
         return _symbol;
     }
 
-    function decimals() private view returns (uint256) {
+    function decimals() public view returns (uint256) {
         return _decimals;
     }
 
-    function totalSupply() private view returns (uint256) {
+    function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
 
@@ -83,10 +78,6 @@ contract ERC20 {
         _balances[_from] -= _value;
         _balances[_to] += _value;
 
-        // if (!_burners.has(_to)) {
-        //     _burners.add(_to);
-        // }
-
         emit Transfer(_from, _to, _value);
         return true;
     }
@@ -101,10 +92,6 @@ contract ERC20 {
         _balances[msg.sender] -= _value;
         _balances[_to] += _value;
 
-        // if (!_burners.has(_to)) {
-        //     _burners.add(_to);
-        // }
-
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
@@ -118,7 +105,7 @@ contract ERC20 {
             spender,
             _allowances[msg.sender][spender] + _addedValue
         );
-        emit Approval(msg.sender, spender, _addedValue);
+
         return true;
     }
 
@@ -132,6 +119,7 @@ contract ERC20 {
             "ERC20: decreased allowance below zero"
         );
         _approve(msg.sender, spender, currentAllowance - subtractedValue);
+
         return true;
     }
 
@@ -140,10 +128,10 @@ contract ERC20 {
         address spender,
         uint256 amount
     ) internal {
-        // require(owner != address(0), "ERC20: approve from the zero address");
         require(spender != address(0), "ERC20: approve to the zero address");
 
         _allowances[owner][spender] = amount;
+        emit Approval(msg.sender, spender, amount);
     }
 
     function mint(address account, uint256 amount)
@@ -156,15 +144,11 @@ contract ERC20 {
         _balances[account] += amount;
         _totalSupply += amount;
 
-        // if (!_burners.has(account)) {
-        //     _burners.add(account);
-        // }
-
         emit Transfer(address(0), account, amount);
         return true;
     }
 
-    function _burn(address account, uint256 amount)
+    function burn(address account, uint256 amount)
         public
         onlyOwner
         returns (bool)
@@ -173,12 +157,9 @@ contract ERC20 {
             _balances[account] >= amount,
             "The balance is less than burning amount"
         );
-        // require(_burners.has(msg.sender), "Does not have a burner role");
 
         _balances[account] -= amount;
         _totalSupply -= amount;
-
-        // emit Burned(msg.sender, amount);
         emit Transfer(account, address(0), amount);
 
         return true;

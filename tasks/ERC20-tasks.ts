@@ -5,7 +5,7 @@ import "@nomiclabs/hardhat-ethers";
 // import "hardhat-typechain";
 // import { ethers } from "hardhat";
 
-task("accounts", "Prints the list of accounts").setAction(async (hre) => {
+task("accounts", "Prints the list of accounts").setAction(async (taskArgs, hre) => {
 
     const accounts = await hre.ethers.getSigners();
 
@@ -33,7 +33,7 @@ task("transfer", "Transfers tokens to a given account")
 
         const account = taskArgs.account;
         const contract = await hre.ethers.getContractAt("ERC20", '0x4b726c514b1613dce69ba7701db46623881b6c86');
-        const amount = hre.ethers.utils.parseUnits(taskArgs.amount, await contract._decimals());
+        const amount = hre.ethers.utils.parseUnits(taskArgs.amount, await contract.decimals());
 
         let result = await contract.transfer(account, amount);
         console.log(result);
@@ -46,9 +46,9 @@ task("mint", "Transfers tokens to a given account")
 
         const account = taskArgs.amount;
         const contract = await hre.ethers.getContractAt("ERC20", '0x4b726c514b1613dce69ba7701db46623881b6c86');
-        const amount = hre.ethers.utils.parseUnits(taskArgs.value, await contract._decimals());
+        const amount = hre.ethers.utils.parseUnits(taskArgs.value, await contract.decimals());
 
-        let result = contract._mint(account, amount);
+        let result = contract.mint(account, amount);
         console.log(result);
 
     });
@@ -60,7 +60,7 @@ task("transferFrom", "Transfers tokens from a given address to another given acc
     .setAction(async (taskArgs: { recipient: any; sender: any, amount: any; }, hre) => {
 
         const contract = await hre.ethers.getContractAt("ERC20", '0x4b726c514b1613dce69ba7701db46623881b6c86');
-        const amount = hre.ethers.utils.parseUnits(taskArgs.amount, await contract._decimals());
+        const amount = hre.ethers.utils.parseUnits(taskArgs.amount, await contract.decimals());
         const recipient = taskArgs.recipient;
         const sender = taskArgs.sender;
 
@@ -76,7 +76,7 @@ task("increaseAllowance", "Increase allowance for an address")
 
         const account = taskArgs.account;
         const contract = await hre.ethers.getContractAt("ERC20", '0x4b726c514b1613dce69ba7701db46623881b6c86');
-        const amount = hre.ethers.utils.parseUnits(taskArgs.amount, await contract._decimals());
+        const amount = hre.ethers.utils.parseUnits(taskArgs.amount, await contract.decimals());
         const signer = await hre.ethers.getSigners();
 
         await contract.increaseAllowance(account, amount);
