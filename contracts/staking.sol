@@ -6,19 +6,30 @@ pragma solidity ^0.8.0;
 // Функция unstake() - списывает с контракта стейкинга ЛП токены доступные для вывода
 // Функции админа для изменения параметров стейкинга (время заморозки, процент)
 
+// LP token address 0xd977a48e53eb31a03f764c6fa920c8e77c79ba08
+
 contract StakingRewards {
     IERC20 public rewardsToken;
     IERC20 public stakingToken;
 
     uint256 public rewardRate = 100;
-    uint256 public lastUpdateTime;
-    uint256 public rewardPerTokenStored;
+    // uint256 public lastUpdateTime;
+    // uint256 public rewardPerTokenStored;
 
-    mapping(address => uint256) public userRewardPerTokenPaid;
-    mapping(address => uint256) public rewards;
+    struct Stakeholder {
+        uint256 stake;
+        uint256 lastStakeTime;
+        uint256 rewardsPaid;
+    }
+
+    Stakeholder public stakeholder;
+
+    mapping(address => Stakeholder) public Stakeholders;
+    // mapping(address => uint256) public rewards;
 
     uint256 private _totalSupply;
-    mapping(address => uint256) private _balances;
+
+    // mapping(address => uint256) private _balances;
 
     constructor(address _stakingToken, address _rewardsToken) {
         stakingToken = IERC20(_stakingToken);
