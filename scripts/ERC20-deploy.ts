@@ -1,8 +1,10 @@
 import { ethers } from "hardhat";
 
+const OWNER_ADDRESS = process.env.OWNER_ADDRESS;
+
 async function main() {
 
-    const deployer = '0x51d2f9f3379Fe7D9fF120c9d34E2a696e838A330'
+    const deployer = OWNER_ADDRESS;
     console.log("Deploying contracts with the account:", deployer);
 
     const ERC20 = await ethers.getContractFactory("ERC20");
@@ -20,4 +22,4 @@ main()
         process.exit(1);
     });
 
-  // deployed to: 0x123a4e70CD8e3c2C05BB4f75Bc6cBa530345A9DC
+  // deployed to: 0x79cCe6B2e90bbB60Fc6D312016c814F482DF1179

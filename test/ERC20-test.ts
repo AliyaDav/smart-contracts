@@ -1,36 +1,27 @@
-// import chai from "chai";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { ERC20 } from "../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-// import "@nomiclabs/hardhat-ethers";
-
-// const { expect } = chai;
 
 describe("ERC20", function () {
 
     let ERC20;
     let erc20: ERC20;
     let owner: SignerWithAddress;
-    // { address: any; };
     let addr1: SignerWithAddress;
-    // { address: any; };
     let addr2: SignerWithAddress;
-    // { address: any; };
 
     const NAME = 'Apple';
     const SYMBOL = 'APL';
     const DECIMALS = 18;
     const TOTAL_SUPPLY = 1000;
     const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-    // const owner = '0x51d2f9f3379Fe7D9fF120c9d34E2a696e838A330';
 
     beforeEach(async function () {
 
         ERC20 = await ethers.getContractFactory("ERC20");
         [owner, addr1, addr2] = await ethers.getSigners();
         erc20 = await ERC20.deploy('Apple', 'APL');
-        // await ERC20.deployed();
 
     });
 
@@ -137,6 +128,16 @@ describe("ERC20", function () {
             await erc20.connect(owner).decreaseAllowance(addr1.address, 20);
 
             expect((await erc20.allowance(owner.address, addr1.address))).to.equal(initial_allowance.add(80));
+        });
+
+        it("Should approve amount", async function () {
+
+            const initial_allowance = await erc20.allowance(addr1.address, addr2.address);
+
+            await erc20.connect(addr1).approve(addr2.address, 100);
+            const new_allowance = await erc20.allowance(addr1.address, addr2.address);
+            expect(new_allowance).to.equal(initial_allowance.add(100));
+
         });
 
     });

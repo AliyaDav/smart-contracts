@@ -19,7 +19,7 @@ const config: HardhatUserConfig = {
   networks: {
     ropsten: {
       url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_PROJECT_ID}`,
-      accounts: [`${ROPSTEN_PRIVATE_KEY}`]
+      accounts: [`${ROPSTEN_PRIVATE_KEY}`],
     },
   },
   gasReporter: {
@@ -27,16 +27,9 @@ const config: HardhatUserConfig = {
     currency: "USD",
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: ETHERSCAN_API_KEY,
   },
 };
 
 export default config;
 
-//   paths: {
-//     tests: "./tests",
-//     sources: "./contracts",
-//     artifacts: "./artifacts",
-//     cache: "./cache",
-//   }
-// };

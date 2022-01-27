@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
-// import "@openzeppelin/contracts/access/Roles.sol";
-
 contract ERC20 {
     string private _name;
     string private _symbol;
@@ -118,6 +116,7 @@ contract ERC20 {
             currentAllowance >= subtractedValue,
             "ERC20: decreased allowance below zero"
         );
+
         _approve(msg.sender, spender, currentAllowance - subtractedValue);
 
         return true;
@@ -131,7 +130,12 @@ contract ERC20 {
         require(spender != address(0), "ERC20: approve to the zero address");
 
         _allowances[owner][spender] = amount;
-        emit Approval(msg.sender, spender, amount);
+        emit Approval(owner, spender, amount);
+    }
+
+    function approve(address spender, uint256 amount) external returns (bool) {
+        _approve(msg.sender, spender, amount);
+        return true;
     }
 
     function mint(address account, uint256 amount)

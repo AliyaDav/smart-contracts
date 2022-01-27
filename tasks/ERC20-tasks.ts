@@ -1,9 +1,8 @@
 import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-ethers";
-// import "@nomiclabs/hardhat-waffle";
-// import "hardhat-typechain";
-// import { ethers } from "hardhat";
+
+const CONTRACT_ADDRESS = '0x39d429694913e907a2d715ace6EB4B6E1B017110'
 
 task("accounts", "Prints the list of accounts").setAction(async (taskArgs, hre) => {
 
@@ -20,7 +19,7 @@ task("balance", "Prints an account's balance")
     .setAction(async (taskArgs: { account: any; }, hre) => {
 
         const account = taskArgs.account;
-        const contract = await hre.ethers.getContractAt("ERC20", '0x4b726c514b1613dce69ba7701db46623881b6c86');
+        const contract = await hre.ethers.getContractAt("ERC20", CONTRACT_ADDRESS);
         const balance = await contract.balanceOf(account);
 
         console.log(balance);
@@ -32,7 +31,7 @@ task("transfer", "Transfers tokens to a given account")
     .setAction(async (taskArgs: { account: any; amount: any; }, hre) => {
 
         const account = taskArgs.account;
-        const contract = await hre.ethers.getContractAt("ERC20", '0x4b726c514b1613dce69ba7701db46623881b6c86');
+        const contract = await hre.ethers.getContractAt("ERC20", CONTRACT_ADDRESS);
         const amount = hre.ethers.utils.parseUnits(taskArgs.amount, await contract.decimals());
 
         let result = await contract.transfer(account, amount);
@@ -42,13 +41,15 @@ task("transfer", "Transfers tokens to a given account")
 task("mint", "Transfers tokens to a given account")
     .addParam("account", "The recipient's address")
     .addParam("amount", "The amount to trasfer")
-    .setAction(async (taskArgs: { amount: any; value: any; }, hre) => {
+    .setAction(async (taskArgs: { account: any; amount: any; }, hre) => {
 
-        const account = taskArgs.amount;
-        const contract = await hre.ethers.getContractAt("ERC20", '0x4b726c514b1613dce69ba7701db46623881b6c86');
-        const amount = hre.ethers.utils.parseUnits(taskArgs.value, await contract.decimals());
+        const account = taskArgs.account;
+        const contract = await hre.ethers.getContractAt("ERC20", CONTRACT_ADDRESS);
+        const amount = hre.ethers.utils.parseUnits(taskArgs.amount, await contract.decimals());
+        const signer = await hre.ethers.getSigners();
+        console.log("amount is", amount);
 
-        let result = contract.mint(account, amount);
+        let result = await contract.connect(signer[0]).mint(account, amount);
         console.log(result);
 
     });
@@ -59,7 +60,7 @@ task("transferFrom", "Transfers tokens from a given address to another given acc
     .addParam("amount", "The amount to trasfer")
     .setAction(async (taskArgs: { recipient: any; sender: any, amount: any; }, hre) => {
 
-        const contract = await hre.ethers.getContractAt("ERC20", '0x4b726c514b1613dce69ba7701db46623881b6c86');
+        const contract = await hre.ethers.getContractAt("ERC20", CONTRACT_ADDRESS);
         const amount = hre.ethers.utils.parseUnits(taskArgs.amount, await contract.decimals());
         const recipient = taskArgs.recipient;
         const sender = taskArgs.sender;
@@ -75,7 +76,7 @@ task("increaseAllowance", "Increase allowance for an address")
     .setAction(async (taskArgs: { account: any; amount: any; }, hre) => {
 
         const account = taskArgs.account;
-        const contract = await hre.ethers.getContractAt("ERC20", '0x4b726c514b1613dce69ba7701db46623881b6c86');
+        const contract = await hre.ethers.getContractAt("ERC20", CONTRACT_ADDRESS);
         const amount = hre.ethers.utils.parseUnits(taskArgs.amount, await contract.decimals());
         const signer = await hre.ethers.getSigners();
 
@@ -90,14 +91,10 @@ task("allowance", "Show allowance of an address")
     .setAction(async (taskArgs: { account: any; }, hre) => {
 
         const account = taskArgs.account;
-        const contract = await hre.ethers.getContractAt("ERC20", '0x4b726c514b1613dce69ba7701db46623881b6c86');
+        const contract = await hre.ethers.getContractAt("ERC20", CONTRACT_ADDRESS);
         const signer = await hre.ethers.getSigners();
 
         let allowance = await contract.allowance(signer[0].address, account);
         console.log(allowance);
 
     });
-
-// test accounts:
-// 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-// 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
