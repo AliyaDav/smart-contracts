@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@openzeppelin/contracts": "^4.4.2",
     "hardhat": "^2.8.3",
     "hardhat-shorthand": "^1.0.0"
   },
