@@ -1,8 +1,8 @@
 import { ethers } from "hardhat";
 
 const OWNER_ADDRESS = process.env.OWNER_ADDRESS;
-const STAKING_TOKEN_ADDRESS = process.env.STAKING_TOKEN_ADDRESS;
-const REWARD_TOKEN_ADDRESS = process.env.REWARD_TOKEN_ADDRESS;
+const STAKING_TOKEN_ADDRESS = '0xd977a48e53eb31a03f764c6fa920c8e77c79ba08';
+const REWARD_TOKEN_ADDRESS = '0x39d429694913e907a2d715ace6eb4b6e1b017110';
 
 async function main() {
 
