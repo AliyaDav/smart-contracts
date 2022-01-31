@@ -1,25 +1,73 @@
 import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-ethers";
+import { ethers } from "hardhat";
 
-const CONTRACT_ADDRESS = '0x39d429694913e907a2d715ace6EB4B6E1B017110'
+const STAKING_CONTRACT_ADDRESS = '0x6960B5d1C46332CD9DA88cA061c06da43D1FC662'
+const LP_TOKEN_ADDRESS = '0xd977a48e53eb31a03f764c6fa920c8e77c79ba08'
 
-task("accounts", "Prints the list of accounts").setAction(async (taskArgs, hre) => {
+task("stake", "Stakes tokens")
+    .addParam("account", "Stakeholder account")
+    .addParam("amount", "Staking amount")
+    .setAction(async (taskArgs: { amount: any; account: any; }, hre) => {
 
-    const accounts = await hre.ethers.getSigners();
+        const staking = await hre.ethers.getContractAt("StakingRewards", STAKING_CONTRACT_ADDRESS);
+        const lptoken = await hre.ethers.getContractAt("IERC20", LP_TOKEN_ADDRESS);
+        const account = await hre.ethers.getSigners();
+        const amount = taskArgs.amount;
 
-    for (const account of accounts) {
-        console.log(account.address);
-    }
-});
+        await lptoken.connect(account[1]).approve(staking.address, amount);
+        console.log('approve completed');
+        let result = await staking.connect(account[1]).stake(amount);
+        console.log(result);
 
-task("balance", "Prints an account's balance")
-    .addParam("account", "The account's address")
+    });
+
+task("unstake", "Unstakes tokens")
+    .addParam("account", "Stakeholder account")
+    .addParam("amount", "Unstaking amount")
+    .setAction(async (taskArgs: { amount: any; account: any; }, hre) => {
+
+        const amount = taskArgs.amount;
+        const account = taskArgs.account;
+        const staking = await hre.ethers.getContractAt("StakingRewards", STAKING_CONTRACT_ADDRESS);
+
+        let result = await staking.connect(account[0]).unstake(amount);
+        console.log(result);
+
+    });
+
+task("claim", "Claims rewards")
+    .addParam("account", "Stakeholder account")
     .setAction(async (taskArgs: { account: any; }, hre) => {
 
         const account = taskArgs.account;
-        const contract = await hre.ethers.getContractAt("ERC20", CONTRACT_ADDRESS);
-        const balance = await contract.balanceOf(account);
+        const staking = await hre.ethers.getContractAt("StakingRewards", STAKING_CONTRACT_ADDRESS);
 
+        let result = await staking.connect(account[0]).claim();
+        console.log(result);
+
+    });
+
+task("transfer-lp-token", "Transfers LP tokens to a given account")
+    .addParam("account", "The recipient's address")
+    .addParam("amount", "The amount to trasfer")
+    .setAction(async (taskArgs: { account: any; amount: any; }, hre) => {
+
+        const account = taskArgs.account;
+        const amount = taskArgs.amount;
+        const lptoken = await hre.ethers.getContractAt("IERC20", LP_TOKEN_ADDRESS);
+        await lptoken.transfer(account, amount);
+
+    });
+
+task("check-staking-balance", "Returns the amount of staken tokens")
+    .addParam("account", "Stakeholder's address")
+    .setAction(async (taskArgs: { account: any; }, hre) => {
+
+        const account = taskArgs.account;
+        const staking = await hre.ethers.getContractAt("StakingRewards", STAKING_CONTRACT_ADDRESS);
+        const balance = await staking.getStakeholderStake(account);
         console.log(balance);
+
     });

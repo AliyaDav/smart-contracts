@@ -32,15 +32,17 @@ contract StakingRewards is AccessControl {
         stakingToken = IERC20(_stakingToken);
         rewardsToken = ERC20(_rewardsToken);
         rewardRate = 20;
-        minStakingTime = 2 seconds;
-        rewardStartTime = 2 seconds;
+        minStakingTime = 10;
+        rewardStartTime = 20;
     }
 
     /* ======================= Modifiers ======================= */
 
     modifier checkStakingTime() {
         require(
-            stakeholders[msg.sender].lastStakeTime + minStakingTime <
+            stakeholders[msg.sender].lastStakeTime +
+                minStakingTime *
+                1 minutes <
                 block.timestamp,
             "Stake is still freezed"
         );
@@ -50,8 +52,10 @@ contract StakingRewards is AccessControl {
     modifier updateReward(address stakeholder) {
         //can we remove the argument?
         require(
-            stakeholders[stakeholder].lastStakeTime <
-                block.timestamp + rewardStartTime,
+            stakeholders[stakeholder].lastStakeTime +
+                rewardStartTime *
+                1 minutes <
+                block.timestamp,
             "Rewards are not available yet"
         );
         stakeholders[stakeholder].rewardsAvailable = _calculateReward(
@@ -74,14 +78,6 @@ contract StakingRewards is AccessControl {
         return stakeholders[stakeholder].stake;
     }
 
-    function getStakeholderTime(address stakeholder)
-        external
-        view
-        returns (uint256)
-    {
-        return stakeholders[stakeholder].lastStakeTime;
-    }
-
     function getStakeholderRewards(address stakeholder)
         external
         view
@@ -100,7 +96,8 @@ contract StakingRewards is AccessControl {
 
     function _calculateReward(address shareholder) internal returns (uint256) {
         uint256 coefficient = (block.timestamp -
-            stakeholders[shareholder].lastStakeTime) / rewardStartTime;
+            stakeholders[shareholder].lastStakeTime) /
+            (rewardStartTime * 1 minutes);
 
         for (uint256 i = 0; i < coefficient; i++) {
             stakeholders[shareholder].rewardsAvailable +=
@@ -112,7 +109,7 @@ contract StakingRewards is AccessControl {
     }
 
     function _transferStake(address stakeholder, uint256 amount) internal {
-        stakingToken.transferFrom(address(this), stakeholder, amount);
+        stakingToken.transfer(stakeholder, amount);
     }
 
     function stake(uint256 amount) external returns (bool) {
@@ -131,11 +128,10 @@ contract StakingRewards is AccessControl {
 
     function claim() external updateReward(msg.sender) returns (bool) {
         uint256 reward = stakeholders[msg.sender].rewardsAvailable;
-        rewardsToken.transferFrom(address(this), msg.sender, reward);
+        rewardsToken.transfer(msg.sender, reward);
         stakeholders[msg.sender].rewardsAvailable = 0;
         _disapproveRewards(msg.sender, reward);
 
-        emit RewardsPaid(msg.sender, reward);
         return true;
     }
 
@@ -145,6 +141,7 @@ contract StakingRewards is AccessControl {
             "Claimed amount exceeds the stake"
         );
         _transferStake(msg.sender, amount);
+        stakeholders[msg.sender].stake -= amount;
         emit Unstaked(msg.sender, amount);
 
         return true;
@@ -166,7 +163,7 @@ contract StakingRewards is AccessControl {
         onlyRole(DEFAULT_ADMIN_ROLE)
         returns (bool)
     {
-        minStakingTime = newMinStakingTime * 1 seconds;
+        minStakingTime = newMinStakingTime;
         return true;
     }
 
@@ -175,7 +172,7 @@ contract StakingRewards is AccessControl {
         onlyRole(DEFAULT_ADMIN_ROLE)
         returns (bool)
     {
-        minStakingTime = newRewardStartTime * 1 seconds;
+        rewardStartTime = newRewardStartTime;
         return true;
     }
 
@@ -183,5 +180,4 @@ contract StakingRewards is AccessControl {
 
     event Staked(address indexed stakeholder, uint256 amount);
     event Unstaked(address indexed stakeholder, uint256 amount);
-    event RewardsPaid(address indexed stakeholder, uint256 amount);
 }
