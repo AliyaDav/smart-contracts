@@ -14,7 +14,7 @@ task("stake", "Stakes tokens")
         const staking = await hre.ethers.getContractAt("StakingRewards", STAKING_CONTRACT_ADDRESS);
         const lptoken = await hre.ethers.getContractAt("IERC20", LP_TOKEN_ADDRESS);
         const account = await hre.ethers.getSigners();
-        const amount = taskArgs.amount;
+        const amount = hre.ethers.utils.parseUnits(taskArgs.amount, 18);
 
         await lptoken.connect(account[1]).approve(staking.address, amount);
         console.log('approve completed');
@@ -28,7 +28,7 @@ task("unstake", "Unstakes tokens")
     .addParam("amount", "Unstaking amount")
     .setAction(async (taskArgs: { amount: any; account: any; }, hre) => {
 
-        const amount = taskArgs.amount;
+        const amount = hre.ethers.utils.parseUnits(taskArgs.amount, 18);
         const account = taskArgs.account;
         const staking = await hre.ethers.getContractAt("StakingRewards", STAKING_CONTRACT_ADDRESS);
 
@@ -55,7 +55,7 @@ task("transfer-lp-token", "Transfers LP tokens to a given account")
     .setAction(async (taskArgs: { account: any; amount: any; }, hre) => {
 
         const account = taskArgs.account;
-        const amount = taskArgs.amount;
+        const amount = hre.ethers.utils.parseUnits(taskArgs.amount, 18);
         const lptoken = await hre.ethers.getContractAt("IERC20", LP_TOKEN_ADDRESS);
         await lptoken.transfer(account, amount);
 
@@ -68,6 +68,7 @@ task("check-staking-balance", "Returns the amount of staken tokens")
         const account = taskArgs.account;
         const staking = await hre.ethers.getContractAt("StakingRewards", STAKING_CONTRACT_ADDRESS);
         const balance = await staking.getStakeholderStake(account);
-        console.log(balance);
+        const balance_formatted = hre.ethers.utils.formatUnits(balance, 18);
+        console.log(balance_formatted);
 
     });
