@@ -1,0 +1,18 @@
+{
+    "title": "",
+    "type": "",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": ""
+        },
+        "description": {
+            "type": "string",
+            "description": ""
+        },
+        "image": {
+            "type": "string",
+            "description": ""
+        }
+    }
+}
