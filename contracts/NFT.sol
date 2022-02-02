@@ -5,12 +5,16 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 
-contract MyNFT is ERC165, IERC721, IERC721Metadata {
+contract MyNFT is Context, ERC165, IERC721, IERC721Metadata {
     using Address for address;
-    using Counter.Counter for tokenIds; // check this
+    using Strings for uint256;
+
+    // using Counter.Counter for _tokenIds; // check this
 
     string private _name;
     string private _symbol;
@@ -23,7 +27,6 @@ contract MyNFT is ERC165, IERC721, IERC721Metadata {
     mapping(uint256 => string) private _tokenURIs;
 
     constructor(string memory name_, string memory symbol_) {
-
         _name = name_;
         _symbol = symbol_;
         _minter = msg.sender;
@@ -38,133 +41,179 @@ contract MyNFT is ERC165, IERC721, IERC721Metadata {
 
     /* ======================= Getters ======================= */
 
-    function balanceOf(address owner) external view virtual override returns (uint256) {
+    function balanceOf(address owner)
+        public
+        view
+        virtual
+        override
+        returns (uint256)
+    {
         require(owner != address(0), "Zero address cannot be owner");
         return (_balances[owner]);
     }
 
-    function ownerOf(uint256 _tokenId) public view virtual override returns (address) {
+    function ownerOf(uint256 _tokenId)
+        public
+        view
+        virtual
+        override
+        returns (address)
+    {
         require(_exists(_tokenId), "Token does not exist");
         return (_owners[_tokenId]);
     }
 
-    function name() external view virtual override returns (string) {
+    function name() external view virtual override returns (string memory) {
         return (_name);
     }
 
-    function symbol() external view virtual override returns (string) {
+    function symbol() external view virtual override returns (string memory) {
         return (_symbol);
     }
 
-    function tokenURI(uint256 _tokenId) external view virtual override returns (string) {
-        require(_exists(tokenId), "URI requested for non-existing token");
+    function tokenURI(uint256 _tokenId)
+        external
+        view
+        virtual
+        override
+        returns (string memory)
+    {
+        require(_exists(_tokenId), "URI requested for non-existing token");
         return (_tokenURIs[_tokenId]);
     }
-    
+
     /* ======================= Functions ======================= */
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC165, IERC165)
+        returns (bool)
+    {
         return
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 
-    function _exists(uint256 tokenId) internal view virtual returns (bool) {
-        return _owners[tokenId] != address(0);
+    function _exists(uint256 _tokenId) internal view virtual returns (bool) {
+        return _owners[_tokenId] != address(0);
     }
 
-    function _isApprovedOrOwner(address spender, uint256 tokenId)
-        internal view virtual
+    function _isApprovedOrOwner(address spender, uint256 _tokenId)
+        internal
+        view
+        virtual
         returns (bool)
     {
         require(
-            _exists(tokenId),
+            _exists(_tokenId),
             "ERC721: operator query for nonexistent token"
         );
-        address owner = ownerOf(tokenId);
+        address owner = ownerOf(_tokenId);
         return (spender == owner ||
-            getApproved(tokenId) == spender ||
+            getApproved(_tokenId) == spender ||
             isApprovedForAll(owner, spender));
     }
 
-    function approve(address to, uint256 tokenId) external virtual override returns (bool) {
-        require(_exists(tokenID), "Approval requested for non-existing token");
+    function approve(address to, uint256 _tokenId) public virtual override {
+        require(_exists(_tokenId), "Approval requested for non-existing token");
         require(
-            msg.sender == ownerof(tokenId) ||
-                msg.sender == getApproved(tokenId),
+            _msgSender() == ownerOf(_tokenId) ||
+                isApprovedForAll(ownerOf(_tokenId), _msgSender()),
             "ERC721: approve caller is not owner nor approved for all"
         );
-        
-        require(to != owner, "ERC721: approval to current owner");
-        _approve(to, tokenId);
-        return true;
+
+        require(to != ownerOf(_tokenId), "ERC721: approval to current owner");
+        _approve(to, _tokenId);
     }
 
-    function _approve(address to, uint256 tokenId) internal virtual {
-        _tokenApprovals[tokenId] = to;
-        emit Approval(ownerOf(tokenId), to, tokenId);
+    function _approve(address to, uint256 _tokenId) internal virtual {
+        _tokenApprovals[_tokenId] = to;
+        emit Approval(ownerOf(_tokenId), to, _tokenId);
     }
 
-    // Returns the account approved for `tokenId` token.
-    function getApproved(uint256 tokenId) public view virtual override returns (address) {
+    // Returns the account approved for `_tokenId` token.
+    function getApproved(uint256 _tokenId)
+        public
+        view
+        virtual
+        override
+        returns (address)
+    {
         require(
-            _exists(tokenID),
+            _exists(_tokenId),
             "ERC721: approved query for nonexistent token"
         );
-        return (_tokenApprovals[tokenId]);
+        return (_tokenApprovals[_tokenId]);
     }
 
     function setApprovalForAll(address operator, bool _approved)
-        external virtual override
-        returns (bool)
+        public
+        virtual
+        override
     {
         require(operator != msg.sender, "Operator cannot be the caller");
 
         _operatorApprovals[msg.sender][operator] = _approved;
         emit ApprovalForAll(msg.sender, operator, _approved);
-        return true;
     }
 
     // Returns if the `operator` is allowed to manage all of the assets of `owner`.
     function isApprovedForAll(address owner, address operator)
         public
-        view virtual override
+        view
+        virtual
+        override
         returns (bool)
     {
-        return _operatorApproval[owner][operator];
+        return _operatorApprovals[owner][operator];
     }
 
     function transferFrom(
         address from,
         address to,
-        uint256 tokenId
-    ) external virtual override {
+        uint256 _tokenId
+    ) public virtual override {
         require(
-            _isApprovedOrOwner(msg.sender, tokenId),
+            _isApprovedOrOwner(msg.sender, _tokenId),
             "ERC721: transfer caller is not owner nor approved"
         );
-        _transfer(from, to, tokenId);
+        _transfer(from, to, _tokenId);
     }
 
     function _transfer(
         address from,
         address to,
-        uint256 tokenId
-    ) internal returns (bool) {
+        uint256 _tokenId
+    ) internal {
         require(
-            ERC721.ownerOf(tokenId) == from,
+            ownerOf(_tokenId) == from,
             "ERC721: transfer of token that is not own"
         );
         require(to != address(0), "ERC721: transfer to the zero address");
 
-        _approve(address(0), tokenId);
+        _approve(address(0), _tokenId);
 
         _balances[from] -= 1;
         _balances[to] += 1;
-        _owners[tokenId] = to;
+        _owners[_tokenId] = to;
 
-        emit Transfer(from, to, tokenId);
+        emit Transfer(from, to, _tokenId);
+    }
+
+    function _safeTransfer(
+        address from,
+        address to,
+        uint256 _tokenId,
+        bytes memory _data
+    ) internal virtual {
+        _transfer(from, to, _tokenId);
+        require(
+            _checkOnERC721Received(from, to, _tokenId, _data),
+            "ERC721: transfer to non ERC721Receiver implementer"
+        );
     }
 
     function safeTransferFrom(
@@ -179,61 +228,46 @@ contract MyNFT is ERC165, IERC721, IERC721Metadata {
         address from,
         address to,
         uint256 tokenId,
-        bytes calldata data
+        bytes memory _data
     ) public virtual override {
         require(
-            _isApprovedOrOwner(msg.sender, tokenId),
-            "The spender is not approved by the token owner"
+            _isApprovedOrOwner(_msgSender(), tokenId),
+            "ERC721: transfer caller is not owner nor approved"
         );
-        _safeTransfer(from, to, tokenId);
+        _safeTransfer(from, to, tokenId, _data);
     }
 
-    function _safeTransfer(
-        address from,
+    function mint(
         address to,
-        uint256 tokenId,
-        bytes memory _data
-    ) internal virtual {
-        _transfer(from, to, tokenId);
-        require(
-            _checkOnERC721Received(from, to, tokenId, _data),
-            "ERC721: transfer to non ERC721Receiver implementer"
-        );
-    }
-
-
-    function mint(address to, string tokenURI) public virtual _onlyMinter returns (bool) {
-
+        uint256 _tokenId,
+        string memory _tokenURI
+    ) public virtual _onlyMinter returns (bool) {
         require(to != address(0), "ERC721: mint to the zero address");
-        require(!_exists(tokenId), "ERC721: token already minted");
+        require(!_exists(_tokenId), "ERC721: token already minted");
 
         _balances[to] += 1;
-        _owners[tokenId] = to;
+        _owners[_tokenId] = to;
+        _tokenURIs[_tokenId] = _tokenURI;
 
-        require(
-            _checkOnERC721Received(address(0), to, tokenId, _data),
-            "ERC721: transfer to non ERC721Receiver implementer"
-        );
-
-        emit Transfer(msg.sender, to, tokenId);
-        
+        emit Transfer(msg.sender, to, _tokenId);
+        return true;
     }
 
-    function burn(uint256 tokenId) public virtual _onlyMinter {
-        address owner = ERC721.ownerOf(tokenId);
+    function burn(uint256 _tokenId) public virtual _onlyMinter {
+        address owner = ownerOf(_tokenId);
 
-        _approve(address(0), tokenId);
+        _approve(address(0), _tokenId);
 
         _balances[owner] -= 1;
-        delete _owners[tokenId];
+        delete _owners[_tokenId];
 
-        emit Transfer(owner, address(0), tokenId);
+        emit Transfer(owner, address(0), _tokenId);
     }
 
-    // function setTokenURI(uint256 tokenId, string memory _uri) public virtual returns(bool) {
-    //     require(ownerOf(tokenId) == msg.sender, "Only token owner can set URI");
+    // function setTokenURI(uint256 _tokenId, string memory _uri) public virtual returns(bool) {
+    //     require(ownerOf(_tokenId) == msg.sender, "Only token owner can set URI");
 
-    //     _tokenURIs[tokenId] = _uri;
+    //     _tokenURIs[_tokenId] = _uri;
     //     return true;
     // }
 
@@ -243,15 +277,15 @@ contract MyNFT is ERC165, IERC721, IERC721Metadata {
     function _checkOnERC721Received(
         address from,
         address to,
-        uint256 tokenId,
+        uint256 _tokenId,
         bytes memory _data
     ) private returns (bool) {
         if (to.isContract()) {
-            t-ry
+            try
                 IERC721Receiver(to).onERC721Received(
-                    msg.sender,
+                    _msgSender(),
                     from,
-                    tokenId,
+                    _tokenId,
                     _data
                 )
             returns (bytes4 retval) {
@@ -262,7 +296,6 @@ contract MyNFT is ERC165, IERC721, IERC721Metadata {
                         "ERC721: transfer to non ERC721Receiver implementer"
                     );
                 } else {
-                    // Inline assembly is a way to access the Ethereum Virtual Machine at a low level.
                     assembly {
                         revert(add(32, reason), mload(reason))
                     }
@@ -272,20 +305,4 @@ contract MyNFT is ERC165, IERC721, IERC721Metadata {
             return true;
         }
     }
-
-    event Transfer(
-        address indexed from,
-        address indexed to,
-        uint256 indexed tokenId
-    );
-    event Approval(
-        address indexed owner,
-        address indexed approved,
-        uint256 indexed tokenId
-    );
-    event ApprovalForAll(
-        address indexed owner,
-        address indexed operator,
-        bool approved
-    );
 }
