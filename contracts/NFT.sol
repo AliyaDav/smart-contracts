@@ -16,8 +16,8 @@ contract MyPropertyNft is Context, IERC721 {
 
     // using Counter.Counter for _tokenIds; // check this
 
-    string private _name;
-    string private _symbol;
+    // string private _name;
+    // string private _symbol;
     address private _minter;
 
     mapping(uint256 => address) private _owners;
@@ -163,8 +163,8 @@ contract MyPropertyNft is Context, IERC721 {
         uint256 _tokenId
     ) public virtual override {
         require(
-            _isApprovedOrOwner(msg.sender, _tokenId),
-            "ERC721: transfer caller is not owner nor approved"
+            _isApprovedOrOwner(from, _tokenId),
+            "ERC721: sender is not owner nor approved"
         );
         _transfer(from, to, _tokenId);
     }
@@ -240,9 +240,10 @@ contract MyPropertyNft is Context, IERC721 {
     }
 
     function burn(uint256 _tokenId) public virtual _onlyMinter {
-        address owner = ownerOf(_tokenId);
 
-        _approve(address(0), _tokenId);
+        address owner = ownerOf(_tokenId);
+        approve(address(0), _tokenId); 
+        // owner should transfer to minter first and only minter can burn nft
 
         _balances[owner] -= 1;
         delete _owners[_tokenId];
