@@ -22,6 +22,10 @@ const config: HardhatUserConfig = {
       url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_PROJECT_ID}`,
       accounts: { mnemonic: MNEMONIC }
     },
+    rinkeby: {
+      url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_PROJECT_ID}`,
+      accounts: { mnemonic: MNEMONIC }
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,

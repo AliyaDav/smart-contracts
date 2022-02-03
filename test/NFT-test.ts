@@ -1,62 +1,61 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { ERC20, StakingRewards } from "../typechain";
+import { MyPropertyNft } from "../typechain";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { parseUnits } from "ethers/lib/utils";
 
+describe("MyPropertyNft", function () {
 
-describe("MyNFT", function () {
-
-    let MyNFT;
-    let nft: MyNFT;
+    let MyPropertyNft;
+    let nft: MyPropertyNft;
     let minter: SignerWithAddress;
     let addr1: SignerWithAddress;
     let addr2: SignerWithAddress;
 
-    const TEST_URI = '';
+    const TEST_URI = "https://gateway.pinata.cloud/ipfs/QmdDLMtBd96QrQvGAfZ2HJSgj5RNLRtui4bCz4EHTa9tbQ?preview=1";
 
     beforeEach(async function () {
 
-        MyNFT = await ethers.getContractFactory("MyNFT");
-        nft = await MyNFT.deploy('BellaVilla', 'BL');
+        MyPropertyNft = await ethers.getContractFactory("MyPropertyNft");
+        nft = await MyPropertyNft.deploy();
 
         [minter, addr1, addr2] = await ethers.getSigners();
 
-        await nft.mint(addr1.address, "");
-
     });
 
-    describe('Getters', function () {
+    describe('Minting', function () {
 
-        it('Should return name and balance', async function () {
+        it('Should mint a new NFT', async function () {
 
-            expect(await nft.name).to.be.equal('BellaVilla');
-            expect(await nft.symbol).to.be.equal('BellaVilla');
-        }
+            const tx = await nft.mint(addr1.address, 1, TEST_URI);
+            await expect(tx).to.emit(nft, 'Transfer').withArgs(minter.address, addr1.address, 1);
+            console.log("done");
+        })
 
-        it('Should mint to an address'), async function () {
+        //     it('Should mint to an address'), async function () {
 
-            const tx = nft.mint(addr1.address, TEST_URI);
-            const tokenId = nft.tokenId();
-            await expect(tx).to.emit(nft, 'Transfer').withArgs(minter.address, addr1.address,)
+        //         const tx = nft.mint(addr1.address, TEST_URI);
+        //         const tokenId = nft.tokenId();
+        //         await expect(tx).to.emit(nft, 'Transfer').withArgs(minter.address, addr1.address,)
 
-        }
-            const initial_stake = await staking.getStakeholderStake(addr1.address);
-        expect(initial_stake).to.be.equal(0);
+        //     }
+        //         const initial_stake = await staking.getStakeholderStake(addr1.address);
+        //     expect(initial_stake).to.be.equal(0);
 
-        await stakingToken.connect(addr1).approve(staking.address, 20);
-        const tx1 = staking.connect(addr1).stake(10);
-        await expect(tx1).to.emit(staking, "Staked").withArgs(addr1.address, 10);
+        //     await stakingToken.connect(addr1).approve(staking.address, 20);
+        //     const tx1 = staking.connect(addr1).stake(10);
+        //     await expect(tx1).to.emit(staking, "Staked").withArgs(addr1.address, 10);
 
-        const new_stake = await staking.getStakeholderStake(addr1.address);
-        expect(new_stake).to.be.equal(10);
+        //     const new_stake = await staking.getStakeholderStake(addr1.address);
+        //     expect(new_stake).to.be.equal(10);
 
-    });
+        // });
 
-    it('Should revert staking LP tokens', async function () {
+        // it('Should revert staking LP tokens', async function () {
 
-        await stakingToken.connect(addr1).approve(staking.address, 10000);
-        const tx = staking.connect(addr1).stake(10000);
-        await expect(tx).to.be.revertedWith("Not have anough funds");
+        //     await stakingToken.connect(addr1).approve(staking.address, 10000);
+        //     const tx = staking.connect(addr1).stake(10000);
+        //     await expect(tx).to.be.revertedWith("Not have anough funds");
 
-    });
+        // });
+    })
+})

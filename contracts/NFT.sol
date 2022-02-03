@@ -6,11 +6,11 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+// import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+// import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 
-contract MyNFT is Context, ERC165, IERC721, IERC721Metadata {
+contract MyPropertyNft is Context, IERC721 {
     using Address for address;
     using Strings for uint256;
 
@@ -26,10 +26,18 @@ contract MyNFT is Context, ERC165, IERC721, IERC721Metadata {
     mapping(address => mapping(address => bool)) private _operatorApprovals; // Mapping from owner to operator approvals
     mapping(uint256 => string) private _tokenURIs;
 
-    constructor(string memory name_, string memory symbol_) {
-        _name = name_;
-        _symbol = symbol_;
+    constructor() {
         _minter = msg.sender;
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override
+        returns (bool)
+    {
+        return interfaceId == type(IERC165).interfaceId;
     }
 
     /* ======================= Modifiers ======================= */
@@ -63,19 +71,10 @@ contract MyNFT is Context, ERC165, IERC721, IERC721Metadata {
         return (_owners[_tokenId]);
     }
 
-    function name() external view virtual override returns (string memory) {
-        return (_name);
-    }
-
-    function symbol() external view virtual override returns (string memory) {
-        return (_symbol);
-    }
-
     function tokenURI(uint256 _tokenId)
         external
         view
         virtual
-        override
         returns (string memory)
     {
         require(_exists(_tokenId), "URI requested for non-existing token");
@@ -83,19 +82,6 @@ contract MyNFT is Context, ERC165, IERC721, IERC721Metadata {
     }
 
     /* ======================= Functions ======================= */
-
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(ERC165, IERC165)
-        returns (bool)
-    {
-        return
-            interfaceId == type(IERC721).interfaceId ||
-            interfaceId == type(IERC721Metadata).interfaceId ||
-            super.supportsInterface(interfaceId);
-    }
 
     function _exists(uint256 _tokenId) internal view virtual returns (bool) {
         return _owners[_tokenId] != address(0);

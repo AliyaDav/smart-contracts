@@ -1,18 +1,12 @@
 {
-    "title": "",
-    "type": "",
-    "properties": {
-        "name": {
-            "type": "string",
-            "description": ""
-        },
-        "description": {
-            "type": "string",
-            "description": ""
-        },
-        "image": {
-            "type": "string",
-            "description": ""
+    "name": "Bella Villa",
+    "description": "This is a wonderful house on Amalfi coast",
+    "image": "https://gateway.pinata.cloud/ipfs/QmXhGzuGMPyRfFEoXYLv7fWXZdv3zeQs7c7pqYU26SSGv9?preview=1",
+    "attributes": [
+        {
+            "house_type": "Villa",
+            "price": 1000000,
+            "size": "458 sq.m."
         }
-    }
+    ]
 }
