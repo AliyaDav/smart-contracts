@@ -1,0 +1,12 @@
+{
+    "name": "Chalet",
+    "description": "Marvelous chalet in the Alps",
+    "image": "https://gateway.pinata.cloud/ipfs/QmdyQZT4FY4ECK8ezhW7wKZS4yy6oFY3T28MLPcckeuRJh",
+    "attributes": [
+        {
+            "house_type": "Chalet",
+            "price": 5000000,
+            "size": "532 sq.m."
+        }
+    ]
+}

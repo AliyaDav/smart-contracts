@@ -11,8 +11,8 @@ describe("MyPropertyNft", function () {
     let addr1: SignerWithAddress;
     let addr2: SignerWithAddress;
 
-    const TEST_URI = "https://gateway.pinata.cloud/ipfs/QmdDLMtBd96QrQvGAfZ2HJSgj5RNLRtui4bCz4EHTa9tbQ?preview=1";
-    const TEST_URI2 = "";
+    const TEST_URI = "TestURI1";
+    const TEST_URI2 = "TestURI2";
     const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
     beforeEach(async function () {
@@ -28,8 +28,8 @@ describe("MyPropertyNft", function () {
 
         it('Should mint a new NFT', async function () {
 
-            const tx = await nft.mint(addr1.address, 1, TEST_URI);
-            await expect(tx).to.emit(nft, 'Transfer').withArgs(minter.address, addr1.address, 1);
+            const tx = nft.mint(addr1.address, 1, TEST_URI);
+            await expect(tx).to.emit(nft, 'Transfer').withArgs(ZERO_ADDRESS, addr1.address, 1);
 
             const tokenURI = await nft.tokenURI(1);
             expect(tokenURI).to.be.equal(TEST_URI);
@@ -38,25 +38,39 @@ describe("MyPropertyNft", function () {
 
         it('Should revert minting a new NFT', async function () {
 
-            const tx1 = await nft.connect(addr2).mint(addr1.address, 1, TEST_URI);
-            await expect(tx1).to.be.revertedWith("Only minter allowed");
+            const tx1 = nft.connect(addr2).mint(addr1.address, 1, TEST_URI);
+            await expect(tx1).to.be.revertedWith("");
 
-            const tx2 = await nft.mint(ZERO_ADDRESS, 1, TEST_URI);
+            const tx2 = nft.mint(ZERO_ADDRESS, 1, TEST_URI);
             await expect(tx2).to.be.revertedWith("ERC721: mint to the zero address");
 
-            await nft.connect(addr2).mint(addr1.address, 1, TEST_URI);
-            const tx3 = nft.connect(addr2).mint(addr1.address, 1, TEST_URI);
+            await nft.mint(addr1.address, 1, TEST_URI);
+            const tx3 = nft.mint(addr1.address, 1, TEST_URI);
             await expect(tx3).to.be.revertedWith("ERC721: token already minted");
 
         });
-    })
+
+        it('Should return NFT URI', async function () {
+
+            await nft.mint(addr1.address, 1, TEST_URI);
+            const tokenURI = await nft.tokenURI(1);
+            expect(tokenURI).to.be.equal(TEST_URI);
+
+            const tokenURI2 = nft.tokenURI(5);
+            await expect(tokenURI2).to.be.revertedWith('')
+
+        });
+    });
 
     describe('Transfers and approvals', function () {
 
         it('Owner should be able to transfer NFT', async function () {
 
             await nft.mint(minter.address, 1, TEST_URI);
-            const tx = nft.transferFrom(minter.address, addr1, 1);
+            const balance0 = await nft.balanceOf(minter.address);
+            expect(balance0).to.be.equal(1);
+
+            const tx = nft.transferFrom(minter.address, addr1.address, 1);
             await expect(tx).to.emit(nft, 'Transfer').withArgs(minter.address, addr1.address, 1);
 
         });
@@ -64,10 +78,18 @@ describe("MyPropertyNft", function () {
         it('TransferFrom should be called by non-owner', async function () {
 
             await nft.mint(minter.address, 1, TEST_URI);
-            await nft.approve(addr1, 1);
+            await nft.approve(addr1.address, 1);
 
-            const tx = nft.transferFrom(minter.address, addr1, 1);
+            const tx = nft.transferFrom(minter.address, addr1.address, 1);
             await expect(tx).to.emit(nft, 'Transfer').withArgs(minter.address, addr1.address, 1);
+
+        });
+
+        it('Should revert transfer to zero address', async function () {
+
+            await nft.mint(minter.address, 1, TEST_URI);
+            const tx = nft.transferFrom(minter.address, ZERO_ADDRESS, 1);
+            await expect(tx).to.be.revertedWith("");
 
         });
 
@@ -75,14 +97,35 @@ describe("MyPropertyNft", function () {
 
             await nft.mint(minter.address, 1, TEST_URI);
 
-            const tx1 = nft.connect(addr2).approve(addr1, 1);
+            const tx1 = nft.connect(addr2).approve(addr1.address, 1);
             await expect(tx1).to.be.revertedWith("ERC721: approve caller is not owner nor approved for all");
 
             const tx2 = nft.approve(minter.address, 1);
             await expect(tx2).to.be.revertedWith("ERC721: approval to current owner");
 
             const tx3 = nft.approve(addr1.address, 2);
-            await expect(tx3).to.be.revertedWith("Approval requested for non-existing token");
+            await expect(tx3).to.be.revertedWith("");
+
+        });
+
+        it('Should revert getApproved', async function () {
+
+            const tx4 = nft.getApproved(2);
+            await expect(tx4).to.be.revertedWith("ERC721: approved query for nonexistent token");
+
+        });
+
+        it('Should return approved address', async function () {
+
+            await nft.mint(minter.address, 1, TEST_URI);
+            await nft.approve(addr1.address, 1);
+
+            const tx4 = nft.getApproved(2);
+            await expect(tx4).to.be.revertedWith("ERC721: approved query for nonexistent token");
+
+            const approved = await nft.getApproved(1);
+            expect(approved).to.be.equal(addr1.address);
+
         });
 
         it('Owner should set approval for all NFTs', async function () {
@@ -90,7 +133,7 @@ describe("MyPropertyNft", function () {
             await nft.mint(minter.address, 1, TEST_URI);
             await nft.mint(minter.address, 2, TEST_URI2);
 
-            const tx = nft.setApprovalForAll(addr1, true);
+            const tx = nft.setApprovalForAll(addr1.address, true);
             await expect(tx).to.emit(nft, 'ApprovalForAll').withArgs(minter.address, addr1.address, true);
 
             const approval = await nft.isApprovedForAll(minter.address, addr1.address);
@@ -101,21 +144,19 @@ describe("MyPropertyNft", function () {
 
             await nft.mint(minter.address, 1, TEST_URI);
             const tx = nft.setApprovalForAll(minter.address, true);
-            await expect(tx).to.be.revertedWith("Operator cannot be the caller");
+            await expect(tx).to.be.revertedWith("");
 
         });
 
-        it('Should safeTransferFrom', async function () {
+        it('Should revert transfer', async function () {
 
             await nft.mint(minter.address, 1, TEST_URI);
-            const initial_balance = await nft.balanceOf(minter.address);
-            expect(initial_balance).to.be.equal(1);
 
-            const tx = nft.safeTransferFrom(minter.address, addr1.address, 1);
-            await expect(tx).to.emit(nft, 'Transfer').withArgs(minter.address, addr1.address, 1);
+            const tx = nft.transferFrom(minter.address, addr1.address, 4);
+            await expect(tx).to.be.revertedWith("ERC721: operator query for nonexistent token");
 
         });
-    })
+    });
 
     describe('Burning NFT', function () {
 
@@ -124,14 +165,31 @@ describe("MyPropertyNft", function () {
             await nft.mint(minter.address, 1, TEST_URI);
             await nft.transferFrom(minter.address, addr1.address, 1);
 
-            const tx = nft.connnect(addr1).burn(1);
-            await expect(tx).to.be.revertedWith("Only minter allowed");
+            const tx = nft.connect(addr1).burn(1);
+            await expect(tx).to.be.revertedWith("");
 
-            await nft.connnect(addr1).transferFrom(addr1.address, minter.address, 1);
+            await nft.connect(addr1).transferFrom(addr1.address, minter.address, 1);
             const tx2 = nft.burn(1);
             await expect(tx2).to.emit(nft, "Transfer").withArgs(minter.address, ZERO_ADDRESS, 1);
 
         });
 
-    })
+    });
+
+    describe('Various checks', function () {
+
+        it('Should revert balance check', async function () {
+
+            const balance = nft.balanceOf(ZERO_ADDRESS);
+            await expect(balance).to.be.revertedWith('');
+
+        });
+
+        it('Contract should receive NFT', async function () {
+
+            await nft.mint(nft.address, 1, TEST_URI);
+        });
+
+    });
+
 })
