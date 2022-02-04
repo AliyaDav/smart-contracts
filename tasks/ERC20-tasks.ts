@@ -2,7 +2,7 @@ import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-ethers";
 
-const CONTRACT_ADDRESS = '0x39d429694913e907a2d715ace6EB4B6E1B017110'
+const ERC20_CONTRACT_ADDRESS = process.env.ERC20_CONTRACT_ADDRESS;
 
 task("accounts", "Prints the list of accounts").setAction(async (taskArgs, hre) => {
 

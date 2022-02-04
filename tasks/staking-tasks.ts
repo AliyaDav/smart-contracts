@@ -3,8 +3,8 @@ import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-ethers";
 import { ethers } from "hardhat";
 
-const STAKING_CONTRACT_ADDRESS = '0x6960B5d1C46332CD9DA88cA061c06da43D1FC662'
-const LP_TOKEN_ADDRESS = '0xd977a48e53eb31a03f764c6fa920c8e77c79ba08'
+const STAKING_CONTRACT_ADDRESS = process.env.STAKING_CONTRACT_ADDRESS;
+const LP_TOKEN_ADDRESS = process.env.STAKING_CONTRACT_ADDRESS;
 
 task("stake", "Stakes tokens")
     .addParam("account", "Stakeholder account")

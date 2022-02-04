@@ -2,7 +2,7 @@ import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-ethers";
 
-const NFT_CONTRACT = '0x0bD592b52998EED1C5Df0cc2b20a33e87F7655E3';
+const NFT_CONTRACT = process.env.NFT_CONTRACT;
 
 task("mintnft", "Mint an NFT")
     .addParam("account", "NFT receiver account")
