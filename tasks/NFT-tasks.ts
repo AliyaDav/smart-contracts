@@ -1,8 +1,11 @@
 import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-ethers";
+import * as dotenv from "dotenv";
+dotenv.config();
 
-const NFT_CONTRACT = process.env.NFT_CONTRACT;
+const NFT_CONTRACT: string = (process.env.NFT_CONTRACT! as string);
+console.log(NFT_CONTRACT);
 
 task("mintnft", "Mint an NFT")
     .addParam("account", "NFT receiver account")
@@ -52,4 +55,15 @@ task("transfernft", "Transfers nft")
         await nft.transferFrom(taskArgs.from, taskArgs.to, taskArgs.tokenid);
         console.log(`NFT ${taskArgs.tokenid}, transfered from ${taskArgs.from} to ${taskArgs.to}`);
 
-    }); 
+    });
+
+task("burnnft", "Burns nft")
+    .addParam("tokenid", "token ID")
+    .setAction(async (taskArgs: { tokenid: any; }, hre) => {
+
+        const nft = await hre.ethers.getContractAt("MyPropertyNft", NFT_CONTRACT);
+
+        await nft.burn(taskArgs.tokenid);
+        console.log(`NFT ${taskArgs.tokenid} is burned`);
+
+    });

@@ -2,9 +2,12 @@ import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-ethers";
 import { ethers } from "hardhat";
+import * as dotenv from "dotenv";
+dotenv.config();
 
-const STAKING_CONTRACT_ADDRESS = process.env.STAKING_CONTRACT_ADDRESS;
-const LP_TOKEN_ADDRESS = process.env.STAKING_CONTRACT_ADDRESS;
+
+const STAKING_CONTRACT_ADDRESS: string = (process.env.STAKING_CONTRACT_ADDRESS as string);
+const LP_TOKEN_ADDRESS: string = (process.env.STAKING_CONTRACT_ADDRESS as string);
 
 task("stake", "Stakes tokens")
     .addParam("account", "Stakeholder account")

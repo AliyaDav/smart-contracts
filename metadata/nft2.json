@@ -4,9 +4,16 @@
     "image": "https://gateway.pinata.cloud/ipfs/QmdyQZT4FY4ECK8ezhW7wKZS4yy6oFY3T28MLPcckeuRJh",
     "attributes": [
         {
-            "house_type": "Chalet",
-            "price": 5000000,
-            "size": "532 sq.m."
+            "trait_type": "House type",
+            "value": "Chalet"
+        },
+        {
+            "trait_type": "Price",
+            "value": 5000000
+        },
+        {
+            "trait_type": "Size",
+            "value": "532 sq.m."
         }
     ]
 }

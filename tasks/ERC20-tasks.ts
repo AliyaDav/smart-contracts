@@ -1,8 +1,10 @@
 import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-ethers";
+import * as dotenv from "dotenv";
+dotenv.config();
 
-const ERC20_CONTRACT_ADDRESS = process.env.ERC20_CONTRACT_ADDRESS;
+const ERC20_CONTRACT_ADDRESS: string = (process.env.ERC20_CONTRACT_ADDRESS as string);
 
 task("accounts", "Prints the list of accounts").setAction(async (taskArgs, hre) => {
 
@@ -18,7 +20,7 @@ task("balance", "Prints an account's balance")
     .setAction(async (taskArgs: { account: any; }, hre) => {
 
         const account = taskArgs.account;
-        const contract = await hre.ethers.getContractAt("ERC20", CONTRACT_ADDRESS);
+        const contract = await hre.ethers.getContractAt("ERC20", ERC20_CONTRACT_ADDRESS);
         const balance = await contract.balanceOf(account);
 
         console.log(balance);
@@ -30,7 +32,7 @@ task("transfer", "Transfers tokens to a given account")
     .setAction(async (taskArgs: { account: any; amount: any; }, hre) => {
 
         const account = taskArgs.account;
-        const contract = await hre.ethers.getContractAt("ERC20", CONTRACT_ADDRESS);
+        const contract = await hre.ethers.getContractAt("ERC20", ERC20_CONTRACT_ADDRESS);
         const amount = hre.ethers.utils.parseUnits(taskArgs.amount, await contract.decimals());
 
         let result = await contract.transfer(account, amount);
@@ -43,7 +45,7 @@ task("mint", "Transfers tokens to a given account")
     .setAction(async (taskArgs: { account: any; amount: any; }, hre) => {
 
         const account = taskArgs.account;
-        const contract = await hre.ethers.getContractAt("ERC20", CONTRACT_ADDRESS);
+        const contract = await hre.ethers.getContractAt("ERC20", ERC20_CONTRACT_ADDRESS);
         const amount = hre.ethers.utils.parseUnits(taskArgs.amount, await contract.decimals());
         const signer = await hre.ethers.getSigners();
         console.log("amount is", amount);
@@ -59,7 +61,7 @@ task("transferFrom", "Transfers tokens from a given address to another given acc
     .addParam("amount", "The amount to trasfer")
     .setAction(async (taskArgs: { recipient: any; sender: any, amount: any; }, hre) => {
 
-        const contract = await hre.ethers.getContractAt("ERC20", CONTRACT_ADDRESS);
+        const contract = await hre.ethers.getContractAt("ERC20", ERC20_CONTRACT_ADDRESS);
         const amount = hre.ethers.utils.parseUnits(taskArgs.amount, await contract.decimals());
         const recipient = taskArgs.recipient;
         const sender = taskArgs.sender;
@@ -75,7 +77,7 @@ task("increaseAllowance", "Increase allowance for an address")
     .setAction(async (taskArgs: { account: any; amount: any; }, hre) => {
 
         const account = taskArgs.account;
-        const contract = await hre.ethers.getContractAt("ERC20", CONTRACT_ADDRESS);
+        const contract = await hre.ethers.getContractAt("ERC20", ERC20_CONTRACT_ADDRESS);
         const amount = hre.ethers.utils.parseUnits(taskArgs.amount, await contract.decimals());
         const signer = await hre.ethers.getSigners();
 
@@ -90,7 +92,7 @@ task("allowance", "Show allowance of an address")
     .setAction(async (taskArgs: { account: any; }, hre) => {
 
         const account = taskArgs.account;
-        const contract = await hre.ethers.getContractAt("ERC20", CONTRACT_ADDRESS);
+        const contract = await hre.ethers.getContractAt("ERC20", ERC20_CONTRACT_ADDRESS);
         const signer = await hre.ethers.getSigners();
 
         let allowance = await contract.allowance(signer[0].address, account);
