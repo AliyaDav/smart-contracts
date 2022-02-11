@@ -9,6 +9,7 @@ import "solidity-coverage";
 import "./tasks/ERC20-tasks";
 import "./tasks/staking-tasks";
 import "./tasks/NFT-tasks";
+import "./tasks/marketplace-task"
 
 dotenv.config();
 
