@@ -5,8 +5,6 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ERC20.sol";
 
-// LP token address 0xd977a48e53eb31a03f764c6fa920c8e77c79ba08
-
 contract StakingRewards is AccessControl {
     /* ======================= Setters ======================= */
 
@@ -50,7 +48,6 @@ contract StakingRewards is AccessControl {
     }
 
     modifier updateReward(address stakeholder) {
-        //can we remove the argument?
         require(
             stakeholders[stakeholder].lastStakeTime +
                 rewardStartTime *

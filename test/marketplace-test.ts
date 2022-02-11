@@ -17,7 +17,6 @@ describe("PropertyMarketplace", function () {
     let addr3: SignerWithAddress;
 
     const TEST_URI = "TestURI1";
-    const TEST_URI2 = "TestURI2";
     const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
     beforeEach(async function () {

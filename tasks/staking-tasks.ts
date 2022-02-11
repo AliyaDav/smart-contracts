@@ -5,7 +5,6 @@ import { ethers } from "hardhat";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-
 const STAKING_CONTRACT_ADDRESS: string = (process.env.STAKING_CONTRACT_ADDRESS as string);
 const LP_TOKEN_ADDRESS: string = (process.env.STAKING_CONTRACT_ADDRESS as string);
 

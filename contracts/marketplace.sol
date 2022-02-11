@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.0;
 
-// import './ERC721.sol';
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -44,9 +43,6 @@ contract PropertyMarketplace is Ownable, ReentrancyGuard {
     Counters.Counter private _itemIds;
     IERC20 public token;
     MyNFT public nft;
-
-    // bytes4 private constant INTERFACE_ID_ERC721 = 0x80ac58cd;
-    // bytes4 private constant INTERFACE_ID_ERC1155 = 0xd9b67a26;
 
     mapping(uint256 => ListedItem) private _itemsListed;
 
