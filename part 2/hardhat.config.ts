@@ -5,7 +5,7 @@ import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
-import "./tasks/bridge-tasks"
+import "./tasks/*"
 
 dotenv.config();
 
@@ -31,16 +31,15 @@ const config: HardhatUserConfig = {
       accounts: { mnemonic: MNEMONIC }
     },
   },
-  gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
-    currency: "USD",
-  },
   etherscan: {
     apiKey: {
       rinkeby: ETHERSCAN_API_KEY,
       bscTestnet: BINANCE_API_KEY,
     }
   },
+  // mocha: {
+  //   timeout: 20000
+  // }
 };
 
 export default config;
