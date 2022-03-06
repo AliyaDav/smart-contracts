@@ -5,7 +5,8 @@ import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
-import "./tasks/*"
+import "./tasks/bridge-tasks";
+import "./tasks/dao-tasks";
 
 dotenv.config();
 

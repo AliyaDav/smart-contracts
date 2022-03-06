@@ -18,6 +18,7 @@ Deployments:
 - [ERC20Base (BscTestnet)](https://testnet.bscscan.com/token/0x916dcd5aede27bf6c68b421c66d39e60cb2735b2?a=0xafb7cde620f31aa72205a74466d35d6bd9264281)
 - [Bridge (Rinkeby)](https://rinkeby.etherscan.io/address/0xbe56c7cc235e25c9873e55df8fc1a2434d74ef2b)
 - [Bridge (BscTestnet)](https://testnet.bscscan.com/address/0x0bd592b52998eed1c5df0cc2b20a33e87f7655e3)
+- [DAO (Rinkeby)](https://rinkeby.etherscan.io/address/0xb9f95a653cfc2498114d56849844d2be8b525085)
 
 Available general tasks:
 

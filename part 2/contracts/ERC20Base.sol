@@ -5,8 +5,9 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract ERC20Base is ERC20, AccessControl {
-    address public admin;
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    address public admin;
+    uint256 private _decimals = 6;
 
     constructor(string memory name, string memory symbol) ERC20(name, symbol) {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
