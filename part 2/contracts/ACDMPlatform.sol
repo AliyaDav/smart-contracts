@@ -31,6 +31,7 @@ contract ACDMPlatform is AccessControl, ReentrancyGuard {
     address public token;
 
     struct Order {
+        uint256 orderId;
         uint256 tokenAmount;
         uint256 tokenPriceGWEI;
         address creator;
@@ -201,7 +202,7 @@ contract ACDMPlatform is AccessControl, ReentrancyGuard {
         );
 
         ERC20Base(token).transferFrom(msg.sender, address(this), _amount);
-        orders[orderId] = Order(_amount, _price, msg.sender);
+        orders[orderId] = Order(orderId, _amount, _price, msg.sender);
         // orderCreators[msg.sender] = orderId;
 
         emit OrderPlaced(roundNum, msg.sender, orderId);

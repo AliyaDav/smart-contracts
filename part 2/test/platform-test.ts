@@ -175,6 +175,8 @@ describe("Platform", function () {
             const balance0After = await addr1.getBalance();
             expect(balance0After).to.be.eq(balance0Before.add(parseUnits("2500.0", "gwei")));
 
+            await platform.redeemOrder(ethers.BigNumber.from('80'), 0, { value: parseUnits("400000.0", "gwei") });
+
         });
 
         it('Should revert paying commision', async function () {
@@ -228,6 +230,9 @@ describe("Platform", function () {
 
         it('Finish trade round and start sale round', async function () {
 
+            const tx1 = platform.startSaleRound();
+            await expect(tx1).to.be.revertedWith("Round: finishing not allowed");
+
             await ethers.provider.send("evm_increaseTime", [300000]);
 
             const amountTraded = await platform.amountTradedGWEI();
@@ -263,6 +268,7 @@ describe("Platform", function () {
 
         it('Should fail to pay commission during sale', async function () {
 
+            console.log(await platform.round());
             await platform.connect(addr2).register(addr5.address);
             const price = await platform.tokenPriceGWEI();
             const ethAmount = ethers.BigNumber.from('1').mul(price);
