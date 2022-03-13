@@ -4,6 +4,7 @@ import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
+import '@primitivefi/hardhat-dodoc';
 import "solidity-coverage";
 import "./tasks/bridge-tasks";
 import "./tasks/dao-tasks";
@@ -16,7 +17,17 @@ const BINANCE_API_KEY = process.env.BINANCE_API_KEY;
 const MNEMONIC = process.env.MNEMONIC;
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.4",
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.4"
+      },
+      {
+        version: "0.6.6",
+        settings: {},
+      },
+    ]
+  },
   networks: {
     ropsten: {
       url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_PROJECT_ID}`,
@@ -31,6 +42,13 @@ const config: HardhatUserConfig = {
       chainId: 97,
       accounts: { mnemonic: MNEMONIC }
     },
+    hardhat: {
+      forking: {
+        url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_PROJECT_ID}`,
+        blockNumber: 14366847,
+        enabled: true,
+      }
+    }
   },
   etherscan: {
     apiKey: {
@@ -38,6 +56,11 @@ const config: HardhatUserConfig = {
       bscTestnet: BINANCE_API_KEY,
     }
   },
+  dodoc: {
+    runOnCompile: false,
+    debugMode: true,
+  },
+
   // mocha: {
   //   timeout: 20000
   // }

@@ -2,7 +2,6 @@ import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { Contract } from "ethers";
 import { expect } from "chai";
-import { equal } from "assert";
 
 describe("DAO", function () {
 
